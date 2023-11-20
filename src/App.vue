@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { createApp, ref, watchEffect } from 'vue'
+import { createApp, onMounted, ref, watchEffect } from 'vue'
 import SandGlass from './components/SandGlass.vue';
 
 const startDate = localStorage.getItem('start') ? new Date(localStorage.getItem('start')!) : new Date()
@@ -43,6 +43,11 @@ async function openPIP() {
     createApp(SandGlass, { body: pipWindow.document.body }).mount(pipMountElement)
   }
 }
+
+onMounted(() => {
+  const input = document.querySelector(`input[type='time']`) as HTMLInputElement
+  input.value = start.value
+})
 </script>
 
 <template>
