@@ -18,8 +18,8 @@ watchEffect(() => {
   localStorage.setItem('start', today.toISOString())
 })
 
-const passColor = ref(localStorage.getItem('passColor') ??'#000000')
-const remainColor = ref(localStorage.getItem('remainColor') ??'#ffffff')
+const passColor = ref(localStorage.getItem('passColor') ??'#4aa587')
+const remainColor = ref(localStorage.getItem('remainColor') ??'#3b2121')
 watchEffect(() => {
   localStorage.setItem('passColor', passColor.value)
   localStorage.setItem('remainColor', remainColor.value)

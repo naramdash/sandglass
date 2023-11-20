@@ -62,7 +62,7 @@ props.body.addEventListener('click', () => {
 
   <div v-if="secondGoesBy < 32400 && minuteLeftVisible"
     style="position: fixed; top: 0; left: 0; margin: 0; padding: 0; width: 100vw; height: 100vh; display: flex; justify-content: center; align-items: center; pointer-events: none;">
-    <span style="font-size: large; color: white;">
+    <span style="font-size: large; color: white; text-shadow: #000000 0px 0 5px;">
       {{ `M-${Math.floor((32400 - secondGoesBy) / 60)}` }}
     </span>
   </div>
