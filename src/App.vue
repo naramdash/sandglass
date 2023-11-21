@@ -1,29 +1,29 @@
 <script setup lang="ts">
-import { createApp, onMounted, ref, watchEffect } from 'vue'
+import { createApp, ref, watchEffect } from 'vue'
 import SandGlass from './components/SandGlass.vue';
 
-const startDate = localStorage.getItem('start') ? new Date(localStorage.getItem('start')!) : new Date()
-const start = ref(`${startDate.getHours()}:${startDate.getMinutes()}`)
-function setStartNow() {
-  const now = new Date()
-  start.value = `${now.getHours()}:${now.getMinutes()}`
-}
+const passColor = ref(localStorage.getItem('passColor') ?? '#4aa587')
+const remainColor = ref(localStorage.getItem('remainColor') ?? '#3b2121')
+const start = ref((() => {
+  const date = new Date(localStorage.getItem('start') ?? new Date().toISOString())
+  return `${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}`
+})())
+
 watchEffect(() => {
-  const [hour, minute] = start.value.split(':')
-
-  const today = new Date()
-  today.setHours(parseInt(hour))
-  today.setMinutes(parseInt(minute))
-
-  localStorage.setItem('start', today.toISOString())
-})
-
-const passColor = ref(localStorage.getItem('passColor') ??'#4aa587')
-const remainColor = ref(localStorage.getItem('remainColor') ??'#3b2121')
-watchEffect(() => {
+  const [h, m] = start.value.split(':')
+  const date = new Date()
+  date.setHours(parseInt(h))
+  date.setMinutes(parseInt(m))
+  localStorage.setItem('start', date.toISOString())
   localStorage.setItem('passColor', passColor.value)
   localStorage.setItem('remainColor', remainColor.value)
 })
+
+function setStartNow() {
+  start.value = `${new Date().getHours().toString().padStart(2, '0')}:${new Date().getMinutes().toString().padStart(2, '0')}`
+}
+function setPassColorDefault() { passColor.value = '#4aa587' }
+function setRemainColorDefault() { remainColor.value = '#3b2121' }
 
 async function openPIP() {
   // @ts-ignore
@@ -40,18 +40,13 @@ async function openPIP() {
     pipWindow.document.body.id = 'pip-body'
     pipWindow.document.body.append(pipMountElement)
 
-    createApp(SandGlass, { body: pipWindow.document.body }).mount(pipMountElement)
+    createApp(SandGlass, { body: pipWindow.document.body, isPIP: true }).mount(pipMountElement)
   }
 }
-
-onMounted(() => {
-  const input = document.querySelector(`input[type='time']`) as HTMLInputElement
-  input.value = start.value
-})
 </script>
 
 <template>
-  <h1>IT JUST ONLY 32400 SECONDS</h1>
+  <h1>IT JUST ONLY 32400 SECONDS (VERSION 2 wow)</h1>
 
   <label>
     Start time
@@ -61,10 +56,13 @@ onMounted(() => {
   <label>
     Pass color
     <input type="color" v-model="passColor" />
+    <button type="button" class="reset" style="background-color: #4aa587;" @click="setPassColorDefault()">reset</button>
   </label>
   <label>
     Remain color
     <input type="color" v-model="remainColor" />
+    <button type="button" class="reset" style="background-color: #3b2121;;"
+      @click="setRemainColorDefault()">reset</button>
   </label>
   <hr />
   <button class="flip" @click="openPIP()">
@@ -72,7 +70,7 @@ onMounted(() => {
     <span style="color: burlywood">L </span>
     <span style="color: cornflowerblue">I </span>
     <span style="color: darkmagenta">P </span>
-    <span style="color: ">{{ ` __   ` }} {{ `   __ ` }}</span>
+    <span style="color: ">{{ ` __ ` }} {{ ` __ ` }}</span>
     <span style="color: darkorange">S </span>
     <span style="color: fuchsia">A </span>
     <span style="color: darkslateblue">N </span>
@@ -82,8 +80,12 @@ onMounted(() => {
     <span style="color: black">A </span>
     <span style="color: indianred">S </span>
     <span style="color: lightsalmon">S </span>
-
+    (open in Document PIP)
   </button>
+
+  <hr />
+
+  <SandGlass :isPIP="false" />
 </template>
 
 <style>
@@ -97,6 +99,11 @@ button.flip {
   font-size: larger;
   font-weight: bolder;
   background-color: gray;
+}
+
+button.reset {
+  color: white;
+  font-weight: bolder;
 }
 </style>
 
