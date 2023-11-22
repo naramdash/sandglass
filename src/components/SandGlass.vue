@@ -3,7 +3,7 @@ import { onMounted, onUnmounted, ref } from 'vue';
 
 const props = defineProps<{ body?: HTMLBodyElement, isPIP: boolean }>()
 
-if(props.isPIP && props.body) {
+if (props.isPIP && props.body) {
   props.body.style.backgroundColor = 'black'
   props.body.style.margin = '0'
 }
@@ -47,17 +47,28 @@ const canvasRenderIntervalId = setInterval(() => {
     }
   }
 
-  renderer.strokeStyle = 'black'
-  renderer.lineWidth = 1
-  renderer.setLineDash([6, 16])
-  renderer.fillStyle = ''
-  for (const row of Array(7).keys()) {
+  for (const row of Array(8).keys()) {
+    const heightBottom = rowHeight * (300 / 9) * (row + 1)
+    const heightTop = heightBottom - 10
+
+    renderer.font = 'bold 15px system-ui'
+    renderer.fillStyle = 'white'
+    renderer.fillText(` ${startTime.value.getHours() + row + 1}:${startTime.value.getMinutes()}`, 0, heightTop)
+
+    renderer.strokeStyle = 'black'
+    renderer.lineWidth = 1
+    renderer.setLineDash([6, 16])
+    renderer.fillStyle = ''
     renderer.beginPath()
-    renderer.moveTo(0, rowHeight * (300 / 8) * (row + 1))
-    renderer.lineTo(rowWidth, rowHeight * (300 / 8) * (row + 1))
+    renderer.moveTo(0, heightBottom)
+    renderer.lineTo(rowWidth, heightBottom)
     renderer.closePath()
     renderer.stroke()
   }
+
+  renderer.font = 'bold 15px system-ui'
+  renderer.fillStyle = 'white'
+  renderer.fillText(` ${startTime.value.getHours() + 9}:${startTime.value.getMinutes()}`, 0, canvasRef.value.height - 15)
 }, 500)
 
 const resizeObserver = new ResizeObserver(([container]) => {
