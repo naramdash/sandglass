@@ -68,7 +68,7 @@ const canvasRenderIntervalId = setInterval(() => {
 
   renderer.font = 'bold 15px system-ui'
   renderer.fillStyle = 'white'
-  renderer.fillText(` ${startTime.value.getHours() + 9}:${startTime.value.getMinutes()}`, 0, canvasRef.value.height - 15)
+  renderer.fillText(` ${(startTime.value.getHours() + 9).toString().padStart(2, '0')}:${(startTime.value.getMinutes()).toString().padStart(2, '0')}`, 0, canvasRef.value.height - 15)
 }, 500)
 
 const resizeObserver = new ResizeObserver(([container]) => {
