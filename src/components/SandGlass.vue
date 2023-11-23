@@ -53,7 +53,7 @@ const canvasRenderIntervalId = setInterval(() => {
 
     renderer.font = 'bold 15px system-ui'
     renderer.fillStyle = 'white'
-    renderer.fillText(` ${startTime.value.getHours() + row + 1}:${startTime.value.getMinutes()}`, 0, heightTop)
+    renderer.fillText(` ${(startTime.value.getHours() + row + 1).toString().padStart(2, '0')}:${(startTime.value.getMinutes()).toString().padStart(2, '0')}`, 0, heightTop)
 
     renderer.strokeStyle = 'black'
     renderer.lineWidth = 1
