@@ -13,15 +13,19 @@ const canvasRef = ref<HTMLCanvasElement>()
 const context2D = ref<CanvasRenderingContext2D>()
 
 const startTime = ref(new Date(localStorage.getItem('start')!))
+const lunchTime = ref(new Date(localStorage.getItem('lunch')!))
 const passColor = ref(localStorage.getItem('passColor')!)
 const remainColor = ref(localStorage.getItem('remainColor')!)
+const lunchTerm = ref(localStorage.getItem('lunchTerm')!)
 
 const goHomeVisible = ref(false)
 const secondGoesBy = ref(0)
 const configLoadIntervalId = setInterval(() => {
   startTime.value = new Date(localStorage.getItem('start')!)
+  lunchTime.value = new Date(localStorage.getItem('lunch')!)
   passColor.value = localStorage.getItem('passColor')!
   remainColor.value = localStorage.getItem('remainColor')!
+  lunchTerm.value = localStorage.getItem('lunchTerm')!
 }, 1000)
 
 const canvasRenderIntervalId = setInterval(() => {
@@ -30,34 +34,68 @@ const canvasRenderIntervalId = setInterval(() => {
   secondGoesBy.value = Math.floor((new Date().getTime() - startTime.value.getTime()) / 1000)
   goHomeVisible.value = secondGoesBy.value >= 32400 && secondGoesBy.value % 2 === 0
 
+  const todaylunchTime = new Date(startTime.value)
+  todaylunchTime.setHours(lunchTime.value.getHours())
+  todaylunchTime.setMinutes(lunchTime.value.getMinutes())
+  todaylunchTime.setSeconds(0)
+  const secondsToLunchFromStart = Math.floor((todaylunchTime.getTime() - startTime.value.getTime()) / 1000)
+  
+  const todayLunchEnd = new Date(todaylunchTime.getTime() + parseInt(lunchTerm.value) * 60 * 1000)
+  const secondsToLunchEndFromStart = Math.floor((todayLunchEnd.getTime() - startTime.value.getTime()) / 1000)
+  
   const renderer = context2D.value
-  renderer.fillStyle = passColor.value
 
   const rowWidth = canvasRef.value.width
   const rowHeight = canvasRef.value.height / (30 * 10)
   const cellWidth = rowWidth / (18 * 6)
 
+  renderer.font = 'bold 15px system-ui'
+  renderer.lineWidth = 1
+  renderer.setLineDash([6, 16])
   renderer.clearRect(0, 0, canvasRef.value.width, canvasRef.value.height)
+
   for (const row of Array(30 * 10).keys()) {
+    renderer.fillStyle = passColor.value
     if (secondGoesBy.value >= (row + 1) * (18 * 6)) {
+      // 이미 지난 시간
       renderer.fillRect(0, rowHeight * row, rowWidth, rowHeight)
     } else if ((row + 1) * (18 * 6) >= secondGoesBy.value && secondGoesBy.value >= (row) * (18 * 6)) {
+      // 지나고 있는 시간
       const diff = secondGoesBy.value - (row) * (18 * 6)
       renderer.fillRect(0, rowHeight * row, diff * cellWidth, rowHeight)
+    }
+
+    if((row + 1) * (18 * 6) >= secondsToLunchFromStart && secondsToLunchFromStart >= (row) * (18 * 6)) {
+      renderer.strokeStyle = 'gold'
+      renderer.fillStyle = 'gold'
+      renderer.beginPath()
+      renderer.moveTo(0, rowHeight * row)
+      renderer.lineTo(rowWidth, rowHeight * row)
+      renderer.closePath()
+      renderer.stroke()
+      renderer.fillText(`Lunch Start`, rowWidth - 90, rowHeight * row - 5)
+    }
+
+    if((row + 1) * (18 * 6) >= secondsToLunchEndFromStart && secondsToLunchEndFromStart >= (row) * (18 * 6)) {
+      renderer.strokeStyle = 'coral'
+      renderer.fillStyle = 'coral'
+      renderer.beginPath()
+      renderer.moveTo(0, rowHeight * row)
+      renderer.lineTo(rowWidth, rowHeight * row)
+      renderer.closePath()
+      renderer.stroke()
+      renderer.fillText(`Lunch End`, rowWidth - 82, rowHeight * row - 5)
     }
   }
 
   for (const row of Array(8).keys()) {
     const heightBottom = rowHeight * (300 / 9) * (row + 1)
-    const heightTop = heightBottom - 10
+    const heightTop = heightBottom - 8
 
-    renderer.font = 'bold 15px system-ui'
     renderer.fillStyle = 'white'
     renderer.fillText(` ${startTime.value.getHours() + row + 1}:${startTime.value.getMinutes()}`, 0, heightTop)
 
     renderer.strokeStyle = 'black'
-    renderer.lineWidth = 1
-    renderer.setLineDash([6, 16])
     renderer.fillStyle = ''
     renderer.beginPath()
     renderer.moveTo(0, heightBottom)
@@ -66,19 +104,16 @@ const canvasRenderIntervalId = setInterval(() => {
     renderer.stroke()
   }
 
-  renderer.font = 'bold 15px system-ui'
+  renderer.font = 'bold 15px monospace'
   renderer.fillStyle = 'white'
   renderer.fillText(` ${startTime.value.getHours() + 9}:${startTime.value.getMinutes()}`, 0, canvasRef.value.height - 15)
 }, 500)
 
 const resizeObserver = new ResizeObserver(([container]) => {
-  const { width, height } = container.contentRect
+  if (canvasRef.value == null) return
 
-  const canvas = canvasRef.value
-  if (canvas == null) return
-
-  canvas.width = width
-  canvas.height = height
+  canvasRef.value.width = container.contentRect.width
+  canvasRef.value.height = container.contentRect.height
 })
 
 onMounted(() => {

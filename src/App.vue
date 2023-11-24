@@ -4,17 +4,31 @@ import SandGlass from './components/SandGlass.vue';
 
 const passColor = ref(localStorage.getItem('passColor') ?? '#4aa587')
 const remainColor = ref(localStorage.getItem('remainColor') ?? '#3b2121')
+const lunchTerm = ref(localStorage.getItem('lunchTerm') ?? '60')
+
 const start = ref((() => {
   const date = new Date(localStorage.getItem('start') ?? new Date().toISOString())
   return `${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}`
 })())
+const lunch = ref((() => {
+  const date = new Date(localStorage.getItem('lunch') ?? "2020-01-01T12:00:00")
+  return `${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}`
+})())
 
 watchEffect(() => {
-  const [h, m] = start.value.split(':')
-  const date = new Date()
-  date.setHours(parseInt(h))
-  date.setMinutes(parseInt(m))
-  localStorage.setItem('start', date.toISOString())
+  const [startHour, startMinute] = start.value.split(':')
+  const startDate = new Date()
+  startDate.setHours(parseInt(startHour))
+  startDate.setMinutes(parseInt(startMinute))
+  localStorage.setItem('start', startDate.toISOString())
+
+  const [lunchHour, lunchMinute] = lunch.value.split(':')
+  const lunchDate = new Date()
+  lunchDate.setHours(parseInt(lunchHour))
+  lunchDate.setMinutes(parseInt(lunchMinute))
+  localStorage.setItem('lunch', lunchDate.toISOString())
+
+  localStorage.setItem('lunchTerm', lunchTerm.value)
   localStorage.setItem('passColor', passColor.value)
   localStorage.setItem('remainColor', remainColor.value)
 })
@@ -49,9 +63,30 @@ async function openPIP() {
   <h1>IT JUST ONLY 32400 SECONDS (VERSION 2 wow)</h1>
 
   <label>
-    Start time
+    Start Time
     <input type="time" v-model="start" />
     <button type="button" @click="setStartNow()">now</button>
+  </label>
+  <label>
+    Lunch Time
+    <input type="time" v-model="lunch" />
+    <input type="range" v-model="lunchTerm" min="30" step="10" max="120" list="lunch-time-markers" />
+    {{ lunchTerm }} minutes
+    
+    <datalist id="lunch-time-markers">
+      <option value="30" label="good"></option>
+      <option value="40" label="40"></option>
+      <option value="50" label="50"></option>
+      <option value="60" label="60"></option>
+      <option value="70" label="70"></option>
+      <option value="80" label="80"></option>
+      <option value="90" label="90"></option>
+      <option value="100" label="100"></option>
+      <option value="110" label="110"></option>
+      <option value="120" label="120"></option>
+    </datalist>
+
+
   </label>
   <label>
     Pass color
@@ -88,9 +123,10 @@ async function openPIP() {
   <SandGlass :isPIP="false" />
 </template>
 
-<style>
+<style scoped>
 label {
   display: block;
+  width: fit-content;
 }
 
 button.flip {
