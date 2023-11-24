@@ -93,7 +93,7 @@ const canvasRenderIntervalId = setInterval(() => {
     const heightTop = heightBottom - 8
 
     renderer.fillStyle = 'white'
-    renderer.fillText(` ${startTime.value.getHours() + row + 1}:${startTime.value.getMinutes()}`, 0, heightTop)
+    renderer.fillText(` ${(startTime.value.getHours() + row + 1).toString().padStart(2, '0')}:${(startTime.value.getMinutes()).toString().padStart(2, '0')}`, 0, heightTop)
 
     renderer.strokeStyle = 'black'
     renderer.fillStyle = ''
@@ -106,7 +106,7 @@ const canvasRenderIntervalId = setInterval(() => {
 
   renderer.font = 'bold 15px monospace'
   renderer.fillStyle = 'white'
-  renderer.fillText(` ${startTime.value.getHours() + 9}:${startTime.value.getMinutes()}`, 0, canvasRef.value.height - 15)
+  renderer.fillText(` ${(startTime.value.getHours() + 9).toString().padStart(2, '0')}:${(startTime.value.getMinutes()).toString().padStart(2, '0')}`, 0, canvasRef.value.height - 15)
 }, 500)
 
 const resizeObserver = new ResizeObserver(([container]) => {
